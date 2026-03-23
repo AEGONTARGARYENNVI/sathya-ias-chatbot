@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Sathya IAS Academy — Enquiry Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0D0B0A;
+  --surface: #161210;
+  --lift: #1F1A17;
+  --edge: #2E2620;
+  --accent: #D4522A;
+  --accent2: #E8763A;
+  --gold: #C4933F;
+  --text: #F0EAE4;
+  --muted: rgba(240,234,228,0.5);
+  --faint: rgba(240,234,228,0.15);
+  --green: #4CAF7D;
+  --r: 10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;display:flex;flex-direction:column}
+
+/* HEADER */
+.header{background:var(--surface);border-bottom:1px solid var(--edge);padding:1rem 1.25rem;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Crimson Pro',serif;font-size:18px;font-weight:600;color:#fff;flex-shrink:0}
+.hinfo{flex:1}
+.hname{font-size:15px;font-weight:600;color:var(--text)}
+.hstatus{font-size:11px;color:var(--green);display:flex;align-items:center;gap:4px}
+.hdot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.lang-toggle{display:flex;background:var(--lift);border-radius:20px;overflow:hidden;border:1px solid var(--edge)}
+.lt-btn{padding:4px 12px;font-size:11px;font-weight:600;border:none;background:none;color:var(--muted);cursor:pointer;transition:all .2s;font-family:'Barlow',sans-serif}
+.lt-btn.on{background:var(--accent);color:#fff}
+
+/* COUNTDOWN BAR */
+.countdown-bar{background:var(--lift);border-bottom:1px solid var(--edge);padding:.6rem 1.25rem;display:flex;gap:1.5rem;overflow-x:auto}
+.cd-item{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.cd-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.cd-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:var(--accent2)}
+
+/* QUICK CHIPS */
+.chips-bar{padding:.75rem 1rem;display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--edge)}
+.chip{flex-shrink:0;padding:5px 12px;border-radius:16px;border:1px solid var(--edge);background:var(--lift);font-size:11px;color:var(--muted);cursor:pointer;transition:all .2s;font-family:'Barlow',sans-serif;font-weight:500}
+.chip:hover{border-color:var(--accent);color:var(--text);background:rgba(212,82,42,0.1)}
+
+/* MESSAGES */
+.messages{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.75rem}
+.msg{max-width:80%;display:flex;flex-direction:column;gap:3px;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.bot{align-self:flex-start}
+.msg.user{align-self:flex-end}
+.bubble{padding:.75rem 1rem;border-radius:var(--r);font-size:14px;line-height:1.65}
+.bot .bubble{background:var(--lift);border:1px solid var(--edge);border-bottom-left-radius:3px}
+.user .bubble{background:var(--accent);color:#fff;border-bottom-right-radius:3px}
+.msg-time{font-size:10px;color:var(--faint);padding:0 4px}
+.bot .msg-time{align-self:flex-start}
+.user .msg-time{align-self:flex-end}
+.typing{display:flex;gap:4px;align-items:center;padding:.75rem 1rem;background:var(--lift);border:1px solid var(--edge);border-radius:var(--r);border-bottom-left-radius:3px;width:fit-content}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:bounce .9s infinite}
+.typing span:nth-child(2){animation-delay:.15s}
+.typing span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+
+/* CARDS inside messages */
+.info-card{background:var(--surface);border:1px solid var(--edge);border-radius:8px;padding:.75rem;margin-top:.5rem}
+.ic-title{font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.06em}
+.ic-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--edge);font-size:12px}
+.ic-row:last-child{border-bottom:none}
+.ic-key{color:var(--muted)}
+.ic-val{color:var(--text);font-weight:500}
+.ic-highlight{color:var(--accent2);font-weight:600}
+
+/* LEAD FORM */
+.lead-form{background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:1rem;margin-top:.5rem}
+.lf-title{font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:.75rem}
+.lf-input{width:100%;background:var(--lift);border:1px solid var(--edge);border-radius:6px;padding:.5rem .75rem;font-size:13px;color:var(--text);font-family:'Barlow',sans-serif;margin-bottom:.5rem;outline:none;transition:border-color .2s}
+.lf-input:focus{border-color:var(--accent)}
+.lf-input::placeholder{color:var(--faint)}
+.lf-btn{width:100%;background:var(--accent);border:none;border-radius:6px;padding:.6rem;font-size:13px;font-weight:600;color:#fff;cursor:pointer;font-family:'Barlow',sans-serif;transition:background .2s}
+.lf-btn:hover{background:var(--accent2)}
+
+/* EMI CALCULATOR */
+.emi-calc{background:var(--surface);border:1px solid var(--edge);border-radius:10px;padding:1rem;margin-top:.5rem}
+.emi-select{width:100%;background:var(--lift);border:1px solid var(--edge);border-radius:6px;padding:.5rem;color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;margin-bottom:.5rem;outline:none}
+.emi-result{background:var(--lift);border-radius:6px;padding:.75rem;text-align:center;font-size:15px;font-weight:600;color:var(--accent2)}
+
+/* INPUT */
+.input-area{padding:.75rem 1rem;border-top:1px solid var(--edge);background:var(--surface);display:flex;gap:8px;align-items:flex-end}
+.text-input{flex:1;background:var(--lift);border:1px solid var(--edge);border-radius:20px;padding:.6rem 1rem;font-size:14px;color:var(--text);font-family:'Barlow',sans-serif;outline:none;resize:none;max-height:100px;transition:border-color .2s}
+.text-input:focus{border-color:var(--accent)}
+.text-input::placeholder{color:var(--faint)}
+.send-btn{width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.send-btn:hover{background:var(--accent2)}
+.send-btn svg{width:16px;height:16px;fill:#fff}
+.voice-btn{width:40px;height:40px;border-radius:50%;background:var(--lift);border:1px solid var(--edge);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.voice-btn.recording{background:rgba(212,82,42,0.3);border-color:var(--accent);animation:recordPulse 1s infinite}
+@keyframes recordPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,82,42,0.4)}50%{box-shadow:0 0 0 8px rgba(212,82,42,0)}}
+.voice-btn svg{width:16px;height:16px;stroke:var(--muted);fill:none}
+
+/* FOOTER BRAND */
+.brand-footer{text-align:center;padding:.4rem;font-size:10px;color:var(--faint);border-top:1px solid var(--edge);letter-spacing:.08em}
+.brand-footer a{color:var(--gold);text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="avatar">S</div>
+  <div class="hinfo">
+    <div class="hname">Sathya IAS Academy</div>
+    <div class="hstatus"><span class="hdot"></span>Enquiry Assistant · Active 24/7</div>
+  </div>
+  <div class="lang-toggle">
+    <button class="lt-btn on" id="btn-ta" onclick="setLang('ta')">தமிழ்</button>
+    <button class="lt-btn" id="btn-en" onclick="setLang('en')">EN</button>
+  </div>
+</div>
+
+<div class="countdown-bar" id="countdown-bar"></div>
+
+<div class="chips-bar" id="chips-bar"></div>
+
+<div class="messages" id="messages"></div>
+
+<div class="input-area">
+  <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice input">
+    <svg viewBox="0 0 24 24" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
+  </button>
+  <textarea class="text-input" id="textInput" placeholder="Type your question here..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+  <button class="send-btn" onclick="sendMessage()">
+    <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+  </button>
+</div>
+<div class="brand-footer">Powered by <a href="https://orrven.app" target="_blank">Orrven</a> · AI Enquiry Infrastructure</div>
+
+<script>
+// ── DATA ──
+const DATA = {
+  name: "Sathya IAS Academy",
+  founded: 2004,
+  contact: "089390 91939",
+  email: "sathyaiasacademy@gmail.com",
+  location: "Arumbakkam, Chennai & Erode",
+  courses: ["UPSC Civil Services","TNPSC Group 1","TNPSC Group 2","TNPSC Group 4","Bank PO (sister concern)"],
+  fees: {"UPSC GS": 74000, "UPSC Optional": 14000, "TNPSC Group 1": 35000, "TNPSC Group 2": 25000, "TNPSC Group 4": 18000},
+  batches: {morning: "7:00 AM – 10:00 AM", evening: "4:00 PM – 7:00 PM", weekend: "Sat & Sun Full Day"},
+  results: ["AIR 45 – Jeyaseelan (2015)","AIR 69 – KP Karthikeyan (2015)","200+ TNPSC selections"],
+  optionals: ["Geography (taught by Mr. Sathya personally)","History","Tamil Literature","Public Administration"],
+  exams: [
+    {name:"UPSC Prelims 2026", date:"2026-05-24"},
+    {name:"UPSC Mains 2026", date:"2026-09-15"},
+    {name:"TNPSC Group 4", date:"2026-03-29"}
+  ],
+  competitors: {
+    "shankar": "Shankar IAS is a good academy. Sathya IAS offers smaller batches (40 students max) for more personal attention, and Mr. Sathya personally teaches Geography.",
+    "brain tree": "Brain Tree focuses on group coaching. At Sathya IAS, batch size is limited to 40 — every student gets direct access to faculty.",
+    "vajiram": "Vajiram is excellent for Delhi-based preparation. Sathya IAS offers the same quality with local Tamil Nadu focus, TNPSC integration, and significantly lower fees."
+  },
+  scholarships: [
+    "Merit Scholarship: Top 10 rank holders in qualifying exam — 25% fee waiver",
+    "Economic Scholarship: Annual family income below ₹2 Lakhs — 30% fee waiver",
+    "Defence/Ex-servicemen ward: 10% fee waiver"
+  ]
+};
+
+let lang = 'ta';
+let leadCaptured = false;
+let awaitingLead = false;
+let leadStep = 0;
+let leadData = {};
+let isRecording = false;
+let recognition = null;
+let conversationContext = [];
+
+// ── LANGUAGE STRINGS ──
+const T = {
+  ta: {
+    welcome: `வணக்கம்! 🙏 நான் Sathya IAS Academy-யின் உதவியாளர். கோர்ஸ் கட்டணம், batch நேரம், தேர்வு தகவல் — எல்லாத்துக்கும் உதவுவேன். என்ன தெரிஞ்சுக்கணும்?`,
+    chips: ["📚 Course & Fee","📅 Batch Timing","🏆 Results","🎓 Scholarship","📝 Register Now","⏱ Exam Dates","🤝 Compare Academies","💰 EMI Options"],
+    leadAsk: "உங்கள் பெயர், phone number, email address சொல்லுங்க — நாங்க உங்களை contact பண்றோம் 📞",
+    leadName: "உங்கள் பெயர் என்ன?",
+    leadPhone: "உங்கள் phone number?",
+    leadEmail: "உங்கள் email address? (optional)",
+    leadDone: "நன்றி! Mr. Sathya தனிப்பட்ட முறையில் உங்களை contact பண்றாங்க. 089390 91939-ல் direct-ஆகவும் call பண்ணலாம்! 🙏",
+    feeTitle: "கட்டண விவரம்",
+    batchTitle: "Batch நேரம்",
+    resultTitle: "தேர்ச்சி சாதனைகள்"
+  },
+  en: {
+    welcome: `Welcome! 🙏 I'm the enquiry assistant for Sathya IAS Academy. Ask me about fees, batches, exam dates, scholarships — anything. How can I help?`,
+    chips: ["📚 Course & Fee","📅 Batch Timing","🏆 Results","🎓 Scholarship","📝 Register Now","⏱ Exam Dates","🤝 Compare Academies","💰 EMI Options"],
+    leadAsk: "Please share your name, phone number and email — our team will contact you personally 📞",
+    leadName: "What's your name?",
+    leadPhone: "Your phone number?",
+    leadEmail: "Your email address? (optional)",
+    leadDone: "Thank you! Mr. Sathya will personally reach out to you. You can also call us directly: 089390 91939 🙏",
+    feeTitle: "Fee Structure",
+    batchTitle: "Batch Timings",
+    resultTitle: "Our Achievements"
+  }
+};
+
+// ── COUNTDOWN ──
+function buildCountdown() {
+  const bar = document.getElementById('countdown-bar');
+  bar.innerHTML = '';
+  const now = new Date();
+  DATA.exams.forEach(ex => {
+    const diff = new Date(ex.date) - now;
+    if(diff < 0) return;
+    const days = Math.floor(diff/86400000);
+    const item = document.createElement('div');
+    item.className = 'cd-item';
+    item.innerHTML = `<div class="cd-label">${ex.name}</div><div class="cd-val">${days} days</div>`;
+    bar.appendChild(item);
+  });
+}
+
+// ── CHIPS ──
+function buildChips() {
+  const bar = document.getElementById('chips-bar');
+  bar.innerHTML = '';
+  T[lang].chips.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.textContent = c;
+    btn.onclick = () => sendMessage(c);
+    bar.appendChild(btn);
+  });
+}
+
+// ── MESSAGES ──
+function time() {
+  return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+
+function addMsg(text, type, html='') {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `msg ${type}`;
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  if(html) bubble.innerHTML = html;
+  else bubble.textContent = text;
+  const t = document.createElement('div');
+  t.className = 'msg-time';
+  t.textContent = time();
+  div.appendChild(bubble);
+  div.appendChild(t);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg bot';
+  div.id = 'typing-indicator';
+  div.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-indicator');
+  if(t) t.remove();
+}
+
+// ── RESPONSE ENGINE ──
+function getResponse(input) {
+  const q = input.toLowerCase();
+  const isTa = lang === 'ta';
+
+  // Fee
+  if(q.includes('fee') || q.includes('கட்டண') || q.includes('cost') || q.includes('price') || q.includes('பணம்') || q.includes('course')) {
+    return {
+      text: isTa ? 'இதோ course-wise கட்டண விவரம்:' : 'Here are the course fees:',
+      card: `<div class="info-card">
+        <div class="ic-title">${T[lang].feeTitle}</div>
+        ${Object.entries(DATA.fees).map(([k,v])=>`<div class="ic-row"><span class="ic-key">${k}</span><span class="ic-val ic-highlight">₹${v.toLocaleString('en-IN')}</span></div>`).join('')}
+        <div class="ic-row"><span class="ic-key">${isTa?'Duration':'Duration'}</span><span class="ic-val">11 months</span></div>
+        <div class="ic-row"><span class="ic-key">${isTa?'Study Material':'Study Material'}</span><span class="ic-val">${isTa?'Included (Free)':'Included (Free)'}</span></div>
+      </div>${emiCard()}`
+    };
+  }
+
+  // Batch
+  if(q.includes('batch') || q.includes('time') || q.includes('நேரம்') || q.includes('timing') || q.includes('schedule')) {
+    return {
+      text: isTa ? 'இப்போது மூன்று batch நேரங்கள் available:' : 'We currently have 3 batch options:',
+      card: `<div class="info-card">
+        <div class="ic-title">${T[lang].batchTitle}</div>
+        <div class="ic-row"><span class="ic-key">🌅 ${isTa?'காலை':'Morning'}</span><span class="ic-val">7:00 AM – 10:00 AM</span></div>
+        <div class="ic-row"><span class="ic-key">🌇 ${isTa?'மாலை':'Evening'}</span><span class="ic-val">4:00 PM – 7:00 PM</span></div>
+        <div class="ic-row"><span class="ic-key">📅 Weekend</span><span class="ic-val">Sat & Sun Full Day</span></div>
+        <div class="ic-row"><span class="ic-key">${isTa?'Branch':'Branch'}</span><span class="ic-val">Chennai & Erode</span></div>
+      </div>`
+    };
+  }
+
+  // Results
+  if(q.includes('result') || q.includes('rank') || q.includes('air') || q.includes('success') || q.includes('தேர்ச்சி') || q.includes('achievem')) {
+    return {
+      text: isTa ? 'எங்கள் மாணவர்களின் சாதனைகள்:' : 'Our students have achieved:',
+      card: `<div class="info-card">
+        <div class="ic-title">${T[lang].resultTitle}</div>
+        ${DATA.results.map(r=>`<div class="ic-row"><span class="ic-val">🏆 ${r}</span></div>`).join('')}
+        <div class="ic-row"><span class="ic-key">${isTa?'Founded':'Founded'}</span><span class="ic-val">2004 — 20+ years of excellence</span></div>
+        <div class="ic-row"><span class="ic-key">${isTa?'Batch Size':'Batch Size'}</span><span class="ic-val">Max 40 students — personal attention</span></div>
+      </div>`
+    };
+  }
+
+  // Scholarship
+  if(q.includes('scholar') || q.includes('discount') || q.includes('concession') || q.includes('உதவித்தொகை') || q.includes('தள்ளுபடி')) {
+    return {
+      text: isTa ? 'கீழ்க்கண்ட scholarship schemes available:' : 'Available scholarship schemes:',
+      card: `<div class="info-card">
+        <div class="ic-title">🎓 Scholarship Schemes</div>
+        ${DATA.scholarships.map(s=>`<div class="ic-row"><span class="ic-val">✓ ${s}</span></div>`).join('')}
+        <div class="ic-row"><span class="ic-key">${isTa?'Apply:':'Apply:'}</span><span class="ic-val">089390 91939</span></div>
+      </div>`
+    };
+  }
+
+  // EMI
+  if(q.includes('emi') || q.includes('instal') || q.includes('monthly') || q.includes('மாதம்') || q.includes('கிஸ்தி')) {
+    return { text: isTa ? 'EMI வசதி available — calculate பண்ணுங்க:' : 'We offer easy EMI options:', card: emiCard() };
+  }
+
+  // Register / lead
+  if(q.includes('register') || q.includes('join') || q.includes('enroll') || q.includes('சேர') || q.includes('admission') || q.includes('contact') || q.includes('call')) {
+    awaitingLead = true; leadStep = 0; leadData = {};
+    return { text: T[lang].leadName };
+  }
+
+  // Exam dates
+  if(q.includes('exam') || q.includes('date') || q.includes('prelim') || q.includes('mains') || q.includes('notification') || q.includes('தேர்வு')) {
+    return {
+      text: isTa ? 'முக்கிய தேர்வு தேதிகள்:' : 'Upcoming exam dates:',
+      card: `<div class="info-card">
+        <div class="ic-title">⏱ Exam Calendar 2026</div>
+        ${DATA.exams.map(e=>{const diff=Math.floor((new Date(e.date)-new Date())/86400000);return `<div class="ic-row"><span class="ic-key">${e.name}</span><span class="ic-val ic-highlight">${diff>0?diff+' days':new Date(e.date).toLocaleDateString('en-IN')}</span></div>`}).join('')}
+      </div>`
+    };
+  }
+
+  // Optional subjects
+  if(q.includes('optional') || q.includes('subject') || q.includes('geography') || q.includes('history') || q.includes('விஷயம்')) {
+    return {
+      text: isTa ? 'Optional subjects available:' : 'Optional subjects we offer:',
+      card: `<div class="info-card">
+        <div class="ic-title">📖 Optional Subjects</div>
+        ${DATA.optionals.map(o=>`<div class="ic-row"><span class="ic-val">✓ ${o}</span></div>`).join('')}
+      </div>`
+    };
+  }
+
+  // Competitor comparison
+  for(const [k,v] of Object.entries(DATA.competitors)) {
+    if(q.includes(k)) return { text: v + (isTa ? '\n\nஉங்களுக்கு best option எது என்று நாங்க personally guide பண்ணலாம் — 089390 91939.' : '\n\nWe can personally guide you to choose what\'s best for you — 089390 91939.') };
+  }
+
+  // Location
+  if(q.includes('location') || q.includes('address') || q.includes('where') || q.includes('எங்கே') || q.includes('branch')) {
+    return { text: isTa ? `எங்கள் branches:\n📍 Chennai: #758, NSK Nagar Signal, Arumbakkam, Poonamallee High Road\n📍 Erode Branch: Contact 089390 91939 for details\n\nGoogle Maps: "Sathya IAS Academy Chennai"` : `Our branches:\n📍 Chennai: #758, NSK Nagar Signal, Arumbakkam, Poonamallee High Road\n📍 Erode Branch: Call 089390 91939 for details` };
+  }
+
+  // Fallback
+  return { text: isTa ? `புரிஞ்சுக்கிட்டேன். இதற்கு நேரடியாக Mr. Sathya-கிட்ட பேசுங்க:\n📞 089390 91939\n📧 sathyaiasacademy@gmail.com\n\nஒரே ஒரு call போதும்! 🙏` : `Understood. For this, please speak directly with our team:\n📞 089390 91939\n📧 sathyaiasacademy@gmail.com\n\nOne call is all it takes! 🙏` };
+}
+
+function emiCard() {
+  return `<div class="emi-calc">
+    <div class="ic-title" style="color:var(--gold);margin-bottom:.5rem">💰 EMI Calculator</div>
+    <select class="emi-select" id="emiCourse" onchange="calcEMI()">
+      <option value="74000">UPSC GS — ₹74,000</option>
+      <option value="88000">UPSC GS + Optional — ₹88,000</option>
+      <option value="35000">TNPSC Group 1 — ₹35,000</option>
+      <option value="25000">TNPSC Group 2 — ₹25,000</option>
+      <option value="18000">TNPSC Group 4 — ₹18,000</option>
+    </select>
+    <select class="emi-select" id="emiMonths" onchange="calcEMI()">
+      <option value="3">3 months</option>
+      <option value="6" selected>6 months</option>
+      <option value="11">11 months (full course)</option>
+    </select>
+    <div class="emi-result" id="emiResult">₹12,333 / month</div>
+  </div>`;
+}
+
+function calcEMI() {
+  const amt = parseInt(document.getElementById('emiCourse')?.value||74000);
+  const mo = parseInt(document.getElementById('emiMonths')?.value||6);
+  const r = document.getElementById('emiResult');
+  if(r) r.textContent = '₹' + Math.ceil(amt/mo).toLocaleString('en-IN') + ' / month';
+}
+
+// ── LEAD FLOW ──
+function handleLeadFlow(input) {
+  if(leadStep === 0) { leadData.name = input; leadStep = 1; return T[lang].leadPhone; }
+  if(leadStep === 1) { leadData.phone = input; leadStep = 2; return T[lang].leadEmail; }
+  if(leadStep === 2) {
+    leadData.email = input;
+    awaitingLead = false; leadCaptured = true;
+    console.log('LEAD CAPTURED:', leadData);
+    return T[lang].leadDone;
+  }
+}
+
+// ── SEND ──
+function sendMessage(override) {
+  const input = override || document.getElementById('textInput').value.trim();
+  if(!input) return;
+  document.getElementById('textInput').value = '';
+  autoResize(document.getElementById('textInput'));
+  addMsg(input, 'user');
+  showTyping();
+  setTimeout(() => {
+    removeTyping();
+    if(awaitingLead) {
+      const r = handleLeadFlow(input);
+      addMsg(r, 'bot');
+    } else {
+      const resp = getResponse(input);
+      const html = resp.text.replace(/\n/g,'<br>') + (resp.card||'');
+      addMsg('', 'bot', html);
+      setTimeout(calcEMI, 100);
+    }
+  }, 600 + Math.random()*400);
+}
+
+// ── VOICE ──
+function toggleVoice() {
+  if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    addMsg(lang==='ta'?'Voice input இந்த browser-ல support இல்ல. Chrome try பண்ணுங்க.':'Voice input not supported in this browser. Please try Chrome.','bot');
+    return;
+  }
+  if(isRecording) { recognition?.stop(); return; }
+  recognition = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+  recognition.lang = lang==='ta'?'ta-IN':'en-IN';
+  recognition.onstart = () => { isRecording=true; document.getElementById('voiceBtn').classList.add('recording'); };
+  recognition.onresult = e => { document.getElementById('textInput').value = e.results[0][0].transcript; };
+  recognition.onend = () => { isRecording=false; document.getElementById('voiceBtn').classList.remove('recording'); };
+  recognition.start();
+}
+
+// ── LANG SWITCH ──
+function setLang(l) {
+  lang = l;
+  document.getElementById('btn-ta').classList.toggle('on', l==='ta');
+  document.getElementById('btn-en').classList.toggle('on', l==='en');
+  document.getElementById('textInput').placeholder = l==='ta'?'உங்கள் கேள்வியை இங்கே type பண்ணுங்க...':'Type your question here...';
+  buildChips();
+}
+
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
+
+// ── INIT ──
+buildCountdown();
+buildChips();
+setTimeout(()=>{ addMsg('', 'bot', T[lang].welcome.replace(/\n/g,'<br>')); }, 500);
+</script>
+</body>
+</html>
